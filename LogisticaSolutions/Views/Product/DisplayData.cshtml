@@ -1,0 +1,107 @@
+﻿@{
+    ViewData["Title"] = "Product List";
+}
+
+<link href="~/lib/datatables/css/dataTables.bootstrap4.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap4.min.css" />
+
+
+
+<h1 class="text-center">Product List</h1>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <table id="Product" class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>Band</th>
+                        <th>Category Code</th>
+                        <th>Manufacturer</th>
+                        <th>Part SKU</th>
+                        <th>Item Description</th>
+                        <th>List Price</th>
+                        <th>Min Discount</th>
+                        <th>Discount Price</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/lib/datatables/js/jquery.dataTables.js"></script>
+    <script src="~/lib/datatables/js/dataTables.bootstrap4.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#Product').dataTable({
+                "processing": true,
+                "serverSide": true,
+                "filter": true,
+                "ajax": {
+                    "url": "/Product/GetData",
+                    "type": "POST",
+                    "datatype": "json"
+                },
+                "columnDefs": [{
+                    "targets": [0],
+                    "visible": false,
+                    "searchable": false
+                }],
+                "columns": [
+                    { "data": "band", "name": "Band", "autowidth": true },
+                    { "data": "categoryCode", "name": "CategoryCode", "autowidth": true },
+                    { "data": "manufacturer", "name": "Manufacturer", "autowidth": true },
+                    { "data": "partSKU", "name": "PartSKU", "autowidth": true },
+                    { "data": "itemDescription", "name": "ItemDescription", "autowidth": true },
+                    { "data": "listPrice", "name": "ListPrice", "autowidth": true },
+                    { "data": "minDiscount", "name": "MinDiscount", "autowidth": true },
+                    { "data": "discountPrice", "name": "DiscountPrice", "autowidth": true },
+                ],
+                "dom": 'Bfrtip',
+                "buttons": [
+                    {
+                        extend: 'excelHtml5',
+                        text: 'Export to Excel',
+                        title: 'Product List',
+                       action: function (e, dt, node, config) {
+                        // Capture the search term and sort order for the export
+                        var searchValue = dt.search(); // Get the search value
+                        var sortOrder = dt.order(); // Get the sort order
+
+                        // Trigger the AJAX request to fetch all filtered data for export
+                        $.ajax({
+                            url: '/Product/GetDataForExport', // Create a new endpoint to fetch all filtered data
+                            type: 'POST',
+                            data: {
+                                searchValue: searchValue,
+                            },
+                            success: function (response) {
+                                // Generate the Excel file from the response
+                                var data = response.data;
+                                var worksheet = XLSX.utils.json_to_sheet(data);
+                                var wb = XLSX.utils.book_new();
+                                XLSX.utils.book_append_sheet(wb, worksheet, "Product List");
+                                XLSX.writeFile(wb, "ProductList.xlsx");
+                                }
+                            });
+                        }
+                    }
+                ]
+            });
+        });
+    </script>
+
+
+
+
+}

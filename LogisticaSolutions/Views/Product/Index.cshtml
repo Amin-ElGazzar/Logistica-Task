@@ -1,0 +1,18 @@
+﻿<div class="container">
+   
+<div class="row">
+    <div class="col-md-6">
+            <form asp-controller="Product" asp-action="ImportData" method="post" enctype="multipart/form-data" class="d-flex align-items-center gap-3">
+
+
+        <!-- File input group -->
+        <div class="d-flex flex-grow-1 align-items-center">
+            <input type="file" name="File" class="form-control me-2" accept=".xls,.xlsx,.xlsm" required />
+        </div>
+
+        <!-- Submit button -->
+        <button type="submit" class="btn btn-secondary">اضافة ملف الاكسل </button>
+    </form>
+    </div>
+    </div>
+</div>
